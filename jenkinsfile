@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Cloner le dépôt') {
+            steps {
+                git 'https://github.com/<ton-utilisateur>/app-pipeline.git'
+            }
+        }
+
+        stage('Installer les dépendances') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('Tester l\'application') {
+            steps {
+                sh 'python -m unittest discover -s tests'
+            }
+        }
+
+        stage('Construire une image Docker') {
+            steps {
+                sh 'docker build -t flask-app .'
+            }
+        }
+
+        stage('Déployer le conteneur Docker') {
+            steps {
+                sh 'docker run -d -p 5000:5000 flask-app'
+            }
+        }
+    }
+}
